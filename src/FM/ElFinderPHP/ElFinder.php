@@ -219,7 +219,23 @@ class ElFinder {
 			$opts['roots'][] = $root;
 		}
 
-		// "mount" volumes
+        // "mount" volumes
+        $this->mountVolumes($opts);
+
+		// if at least one redable volume - ii desu >_<
+		$this->loaded = !empty($this->default);
+	}
+
+    /**
+     * Mount volumes
+     *
+     * Instantiate corresponding driver class and
+     * add it to the list of volumes.
+     *
+     * @param array $opts
+     */
+    protected function mountVolumes($opts)
+    {
 		foreach ($opts['roots'] as $i => $o) {
 			$class = 'FM\ElFinderPHP\Driver\ElFinderVolume'.(isset($o['driver']) ? $o['driver'] : '');
 
@@ -241,11 +257,8 @@ class ElFinder {
 				$this->mountErrors[] = 'Driver "'.$class.'" does not exists';
 			}
 		}
+    }
 
-		// if at least one redable volume - ii desu >_<
-		$this->loaded = !empty($this->default);
-	}
-	
 	/**
 	 * Return true if fm init correctly
 	 *
