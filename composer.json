@@ -20,7 +20,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "dropbox-php/dropbox-php": "1.*"
     },
     "autoload": {
         "psr-0": {"FM\\ElFinderPHP": "src/"}

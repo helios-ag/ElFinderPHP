@@ -26,14 +26,14 @@ class ElFinderVolumeLocalFileSystem extends ElFinderVolumeDriver {
 	 * @var int
 	 **/
 	protected $archiveSize = 0;
-	
-	/**
-	 * Constructor
-	 * Extend options with required fields
-	 *
-	 * @return void
-	 * @author Dmitry (dio) Levashov
-	 **/
+
+    /**
+     * Constructor
+     * Extend options with required fields
+     *
+     * @return \FM\ElFinderPHP\Driver\ElFinderVolumeLocalFileSystem
+     * @author Dmitry (dio) Levashov
+     */
 	public function __construct() {
 		$this->options['alias']    = '';              // alias to replace root dir name
 		$this->options['dirMode']  = 0755;            // new dirs mode

@@ -3,6 +3,7 @@
 namespace FM\ElFinderPHP\Driver;
 
 use FM\ElFinderPHP\ElFinder;
+
 function chmodnum($chmod) {
     $trans = array('-' => '0', 'r' => '4', 'w' => '2', 'x' => '1');
     $chmod = substr(strtr($chmod, $trans), 1);
@@ -65,14 +66,14 @@ class ElFinderVolumeFTP extends ElFinderVolumeDriver {
 	 **/
 	protected $tmp = '';
 
-	/**
-	 * Constructor
-	 * Extend options with required fields
-	 *
-	 * @return void
-	 * @author Dmitry (dio) Levashov
-	 * @author Cem (DiscoFever)
-	 **/
+    /**
+     * Constructor
+     * Extend options with required fields
+     *
+     * @return \FM\ElFinderPHP\Driver\ElFinderVolumeFTP
+     * @author Dmitry (dio) Levashov
+     * @author Cem (DiscoFever)
+     */
 	public function __construct() {
 		$opts = array(
 			'host'          => 'localhost',
