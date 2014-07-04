@@ -676,12 +676,9 @@ class ElFinderVolumeLocalFileSystem extends ElFinderVolumeDriver {
 	 * @author Alexey Sukhotin
 	 **/
 	protected function _unpack($path, $arc) {
-		$cwd = getcwd();
 		$dir = $this->_dirname($path);
-		chdir($dir);
 		$cmd = $arc['cmd'].' '.$arc['argc'].' '.escapeshellarg($this->_basename($path));
-		$this->procExec($cmd, $o, $c);
-		chdir($cwd);
+		$this->procExec($cmd, $o, $c, $e = null, $dir);
 	}
 
 	/**
@@ -824,14 +821,10 @@ class ElFinderVolumeLocalFileSystem extends ElFinderVolumeDriver {
 	 * @author Alexey Sukhotin
 	 **/
 	protected function _archive($dir, $files, $name, $arc) {
-		$cwd = getcwd();
-		chdir($dir);
-		
 		$files = array_map('escapeshellarg', $files);
 		
 		$cmd = $arc['cmd'].' '.$arc['argc'].' '.escapeshellarg($name).' '.implode(' ', $files);
-		$this->procExec($cmd, $o, $c);
-		chdir($cwd);
+		$this->procExec($cmd, $o, $c, $e = null, $dir);
 
 		$path = $dir.DIRECTORY_SEPARATOR.$name;
 		return file_exists($path) ? $path : false;

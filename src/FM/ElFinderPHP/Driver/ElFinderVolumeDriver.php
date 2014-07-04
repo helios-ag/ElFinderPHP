@@ -3034,7 +3034,7 @@ abstract class ElFinderVolumeDriver {
 	 * @return int     exit code
 	 * @author Alexey Sukhotin
 	 **/
-	protected function procExec($command , array &$output = null, &$return_var = -1, array &$error_output = null) {
+	protected function procExec($command , array &$output = null, &$return_var = -1, array &$error_output = null, $path = null) {
 
 		$descriptorspec = array(
 			0 => array("pipe", "r"),  // stdin
@@ -3042,7 +3042,7 @@ abstract class ElFinderVolumeDriver {
 			2 => array("pipe", "w")   // stderr
 		);
 
-		$process = proc_open($command, $descriptorspec, $pipes, null, null);
+		$process = proc_open($command, $descriptorspec, $pipes, $path, null);
 
 		if (is_resource($process)) {
 
