@@ -27,6 +27,6 @@
         "aws/aws-sdk-php": "Allows you to use AWS S3 storage"
     },
     "autoload": {
-        "psr-0": {"FM\\ElFinderPHP\\": "src/"}
+        "psr-4": {"FM\\ElFinderPHP\\": "src/"}
     }
 }
