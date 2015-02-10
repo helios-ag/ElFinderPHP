@@ -1,8 +1,8 @@
 {
-    "name": "nicolasmure/fm-elfinder-php-connector",
+    "name": "helios-ag/fm-elfinder-php-connector",
     "description": "ElFinder PHP backend, 5.3 compliant",
     "keywords": ["elfinder", "filemanager"],
-    "homepage": "http://github.com/nicolasmure/ElFinderPHP",
+    "homepage": "http://github.com/helios-ag/ElFinderPHP",
     "type": "library",
     "license": "BSD-3 Clause",
     "authors": [
