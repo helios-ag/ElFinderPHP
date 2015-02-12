@@ -54,8 +54,8 @@ class ElFinderConnector {
      * @return void
      * @author Nicolas MURE
      **/
-    public function runAndExit() {
-        exit(json_encode($this->run()));
+    public function run() {
+        exit(json_encode($this->execute()));
     }
 
     /**
@@ -64,7 +64,7 @@ class ElFinderConnector {
      * @return array
      * @author Dmitry (dio) Levashov
      **/
-    public function run() {
+    public function execute() {
         $isPost = $_SERVER["REQUEST_METHOD"] == 'POST';
         $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? $_POST : $_GET;
         if ($isPost && !$src && $rawPostData = @file_get_contents('php://input')) {
