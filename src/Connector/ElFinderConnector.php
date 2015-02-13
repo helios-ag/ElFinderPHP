@@ -52,9 +52,19 @@ class ElFinderConnector {
      * Execute elFinder command and output result
      *
      * @return void
-     * @author Dmitry (dio) Levashov
+     * @author Nicolas MURE
      **/
     public function run() {
+        exit(json_encode($this->execute()));
+    }
+
+    /**
+     * Execute elFinder command and returns result
+     *
+     * @return array
+     * @author Dmitry (dio) Levashov
+     **/
+    public function execute() {
         $isPost = $_SERVER["REQUEST_METHOD"] == 'POST';
         $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? $_POST : $_GET;
         if ($isPost && !$src && $rawPostData = @file_get_contents('php://input')) {
@@ -72,21 +82,21 @@ class ElFinderConnector {
 
         if (!function_exists('json_encode')) {
             $error = $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_JSON);
-            $this->output(array('error' => '{"error":["'.implode('","', $error).'"]}', 'raw' => true));
+            return $this->output(array('error' => '{"error":["'.implode('","', $error).'"]}', 'raw' => true));
         }
 
         if (!$this->elFinder->loaded()) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors));
+            return $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors));
         }
 
         // telepat_mode: on
         if (!$cmd && $isPost) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html'));
+            return $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html'));
         }
         // telepat_mode: off
 
         if (!$this->elFinder->commandExists($cmd)) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)));
+            return $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)));
         }
 
         // collect required arguments to exec command
@@ -99,21 +109,21 @@ class ElFinderConnector {
                 $arg = trim($arg);
             }
             if ($req && (!isset($arg) || $arg === '')) {
-                $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)));
+                return $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)));
             }
             $args[$name] = $arg;
         }
 
         $args['debug'] = isset($src['debug']) ? !!$src['debug'] : false;
 
-        $this->output($this->elFinder->exec($cmd, $this->input_filter($args)));
+        return $this->output($this->elFinder->exec($cmd, $this->input_filter($args)));
     }
 
     /**
-     * Output json
+     * Output data to array
      *
      * @param  array  data to output
-     * @return void
+     * @return array
      * @author Dmitry (dio) Levashov
      **/
     protected function output(array $data) {
@@ -135,12 +145,12 @@ class ElFinderConnector {
             if (!empty($data['volume'])) {
                 $data['volume']->close($data['pointer'], $data['info']['hash']);
             }
-            exit();
+            return array();
         } else {
             if (!empty($data['raw']) && !empty($data['error'])) {
-                exit($data['error']);
+                return array('error' => $data['error']);
             } else {
-                exit(json_encode($data));
+                return $data;
             }
         }
 
