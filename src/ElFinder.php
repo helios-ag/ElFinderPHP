@@ -1596,7 +1596,7 @@ class ElFinder {
                 break;
             }
 
-            fclose($fp);
+            if(is_resource($fp)) fclose($fp);
             if (! is_uploaded_file($tmpname) && @ unlink($tmpname)) unset($GLOBALS['elFinderTempFiles'][$tmpname]);
             $result['added'][] = $file;
         }
