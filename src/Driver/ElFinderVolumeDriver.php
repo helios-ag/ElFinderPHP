@@ -2175,6 +2175,9 @@ abstract class ElFinderVolumeDriver {
             if (empty($stat['phash'])) {
                 $stat['phash'] = $this->encode($this->_dirname($path));
             }
+            if (empty($stat['path'])) {
+                $stat['path'] = $this->_path($path);
+            }
         }
 
         // fix name if required

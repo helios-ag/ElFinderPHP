@@ -51,22 +51,23 @@ class ElFinderConnector {
     /**
      * Execute elFinder command and output result
      *
+     * @param  array  $queryParameters GET query parameters.
      * @return void
      * @author Nicolas MURE
      **/
-    public function run() {
-        exit(json_encode($this->execute()));
+    public function run($queryParameters) {
+        exit(json_encode($this->execute($queryParameters)));
     }
 
     /**
      * Execute elFinder command and returns result
-     *
+     * @param  array  $queryParameters GET query parameters.
      * @return array
      * @author Dmitry (dio) Levashov
      **/
-    public function execute() {
+    public function execute($queryParameters) {
         $isPost = $_SERVER["REQUEST_METHOD"] == 'POST';
-        $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? $_POST : $_GET;
+        $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? $_POST : $queryParameters;
         if ($isPost && !$src && $rawPostData = @file_get_contents('php://input')) {
             // for support IE XDomainRequest()
             $parts = explode('&', $rawPostData);
