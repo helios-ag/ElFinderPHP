@@ -381,33 +381,7 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
      * @author Alexey Sukhotin
      **/
     protected function _fopen($path, $mode="rb") {
-
         return fopen('s3://'.$this->options['bucket'].'/'.$this->_normpath($path), $mode);
-//        $tn = $this->tmpname($path);
-//
-//        $fp = $this->tmbPath
-//            ? @fopen($tn, 'w+')
-//            : @tmpfile();
-//
-//
-//        if ($fp) {
-//
-//            try {
-//                $obj = $this->s3->GetObject(array('Bucket' => $this->options['bucket'], 'Key' => $this->_normpath($path) , 'GetMetadata' => true, 'InlineData' => true, 'GetData' => true));
-//            }	catch (Exception $e) {
-//
-//            }
-//
-//            $mime = '';
-//
-//            $metadata = $this->metaobj2array($obj->GetObjectResponse->Metadata);
-//
-//            fwrite($fp, $obj->GetObjectResponse->Data);
-//            rewind($fp);
-//            return $fp;
-//        }
-//
-//        return false;
     }
 
     /**
