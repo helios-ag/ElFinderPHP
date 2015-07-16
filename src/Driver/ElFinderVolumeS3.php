@@ -38,6 +38,8 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
     protected function init() {
         if (!$this->options['accesskey']
             || !$this->options['secretkey']
+            || !$this->options['signature']
+            || !$this->options['region']
             ||  !$this->options['bucket']) {
             return $this->setError('Required options undefined.');
         }
@@ -45,6 +47,8 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
         $this->s3 = S3Client::factory([
             'key' => $this->options['accesskey'],
             'secret' => $this->options['secretkey'],
+            'signature' => $this->options['signature'],
+            'region' => $this->options['region']
         ]);
         $this->s3->registerStreamWrapper();
 
@@ -151,7 +155,16 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
      * @author Dmitry (dio) Levashov
      **/
     protected function _abspath($path) {
-        return $path == $this->separator ? $this->root : $this->root.$this->separator.$path;
+        if ($path == $this->separator) {
+            return $this->root;
+        } else {
+            $path = $this->root.$this->separator.$path;
+            // Weird.. fixes "///" in paths.
+            while (preg_match("/\/\//", $path)) {
+                $path = preg_replace("/\/\//", "/", $path);
+            }
+            return $path;
+        }
     }
 
     /**
@@ -230,6 +243,10 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
             'mime' => 'directory',
         );
 
+        // S3 apparently doesn't understand paths Key with a "/" at the end
+        if (substr($path, -1) == "/") {
+            $path = substr($path, 0, strlen($path) - 1);
+        }
 
         if ($this->root == $path) {
             return $stat;
@@ -251,13 +268,16 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
             }
         }
 
+        // No obj means it's a folder, or it really doesn't exist
         if (!isset($obj)) {
-            return false;
+            if (!$this->_scandir($path)) {
+                return false;
+            } else {
+                return $stat;
+            }
         }
 
         $mime = '';
-        $metadata = $obj->get('Metadata');
-
 
         if ($obj->hasKey('Last-Modified')) {
             $stat['ts'] = strtotime($obj->get('Last-Modified'));
@@ -269,7 +289,7 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
 
         }
 
-        $mime = $obj->get('Content-Type');
+        $mime = $obj->get('ContentType');
         $stat['mime'] = substr($np, -1) == '/' ? 'directory' : (!$mime ? 'text/plain' : $mime);
         foreach ($files as $file) {
             if ($file['Key'] == $np) {
@@ -334,25 +354,32 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
      **/
     protected function _scandir($path) {
 
-        $s3path = preg_replace("/^\//", "", $path) . '/';
+        $s3path = preg_replace("/\/$/", "", $path);
+        $s3path = preg_replace("/^\//", "", $s3path);
 
         $files = (array)$this->s3->listObjects(array('Bucket' => $this->options['bucket'], 'delimiter' => '/', 'Prefix' => $s3path))->get('Contents');
 
-
-
-
         $finalfiles = array();
-
+        $folders = array();
         foreach ($files as $file) {
-            if (preg_match("|^" . $s3path . "[^/]*/?$|", $file['Key'])) {
-                $fname = preg_replace("/\/$/", "", $file['Key']);
+            if (preg_match("|^" . preg_replace("/^\//", "", $s3path) . '/' . "[^/]*/?$|", $file['Key'])) {
                 $fname = $file['Key'];
-
-                if ($fname != preg_replace("/\/$/", "", $s3path)) {
-
+                if (!$fname || $fname == preg_replace("/\/$/", "", $s3path) || $fname == preg_replace("/$/", "/", $s3path)) {
+                    continue;
                 }
+                $finalfiles[] = preg_replace("/\/$/", "", $fname);
+            } else {
+                $matches = array();
+                if ($res = preg_match("|^" . preg_replace("/^\//", "", $s3path) . '/' . "(.*?)\/|", $file['Key'], $matches)) {
+                    $folders[$matches[1]] = true;
+                }
+            }
+        }
 
-                $finalfiles[] = $fname;
+        // Folders retrieved differently, as it's not a real object on S3
+        foreach ($folders as $forlderName => $tmp) {
+            if (!in_array(preg_replace("/^\//", "", $s3path)."/".$forlderName, $finalfiles)) {
+                $finalfiles[] = preg_replace("/^\//", "", $s3path)."/".$forlderName;
             }
         }
 
