@@ -141,6 +141,8 @@ class ElFinderConnector {
         }
 
         if (isset($data['pointer'])) {
+            // The output buffer might be dirty which causes broken file downloads. 
+            ob_end_clean(); 
             rewind($data['pointer']);
             fpassthru($data['pointer']);
             if (!empty($data['volume'])) {
