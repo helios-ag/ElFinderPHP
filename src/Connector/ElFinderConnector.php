@@ -51,11 +51,14 @@ class ElFinderConnector {
     /**
      * Execute elFinder command and output result
      *
-     * @param  array  $queryParameters GET query parameters.
+     * @param  array  $queryParameters (optional) Provided query parameters or auto guessed via $_GET.
      * @return void
      * @author Nicolas MURE
      **/
-    public function run($queryParameters) {
+    public function run($queryParameters = null) {
+        if ($queryParameters === null) {
+            $queryParameters = $_GET;
+        }
         exit(json_encode($this->execute($queryParameters)));
     }
 
