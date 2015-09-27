@@ -561,7 +561,15 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
      * @author Dmitry (dio) Levashov
      **/
     protected function _rmdir($path) {
-        return $this->_unlink($path . '/');
+        $newkey = $this->_normpath($path).'/';
+
+        try {
+            $obj = $this->s3->deleteObject(array('Bucket' => $this->options['bucket'], 'Key' => $newkey));
+            return true;
+        } catch (Exception $e) {
+
+        }
+        return false;
     }
 
     /**
