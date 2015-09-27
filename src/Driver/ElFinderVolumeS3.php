@@ -611,7 +611,15 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
         $newkey = $this->_normpath($path);
         $newkey = preg_replace("/\/$/", "", $newkey);
 
-        $this->s3->putObject(['Bucket' => $this->options['bucket'], 'Key' => $newkey, 'Body' => $content, 'ACL' => CannedAcl::PUBLIC_READ]);
+        $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        $this->s3->putObject([
+            'Bucket' => $this->options['bucket'],
+            'Key' => $newkey,
+            'Body' => $content,
+            'ACL' => CannedAcl::PUBLIC_READ,
+            'ContentType' => self::$mimetypes[$ext]
+        ]);
         return true;
     }
 
