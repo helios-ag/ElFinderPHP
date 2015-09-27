@@ -444,16 +444,11 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
         $newkey = "$newkey/$name/";
 
         try {
-            mkdir('s3://'.$this->options['bucket'].$newkey);
-        } catch (Exception $e) {
-
-        }
-
-        if (isset($obj)) {
+            mkdir('s3://'.$this->options['bucket'].'/'.$newkey);
             return "$path/$name";
+        } catch (Exception $e) {
+            return false;
         }
-
-        return false;
     }
 
     /**
