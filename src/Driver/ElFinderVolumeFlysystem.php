@@ -391,8 +391,12 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
     protected function _save($fp, $dir, $name, $stat)
     {
         $path = $this->_joinPath($dir, $name);
-
-        if ($this->fs->putStream($path, $fp)) {
+        $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $config = [];
+        if (isset(self::$mimetypes[$ext])) {
+            $config['mimetype'] = self::$mimetypes[$ext];
+        }
+        if ($this->fs->putStream($path, $fp, $config)) {
             return $path;
         }
 
