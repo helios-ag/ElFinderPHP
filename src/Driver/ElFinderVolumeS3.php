@@ -444,16 +444,11 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
         $newkey = "$newkey/$name/";
 
         try {
-            mkdir('s3://'.$this->options['bucket'].$newkey);
-        } catch (Exception $e) {
-
-        }
-
-        if (isset($obj)) {
+            mkdir('s3://'.$this->options['bucket'].'/'.$newkey);
             return "$path/$name";
+        } catch (Exception $e) {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -566,7 +561,15 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
      * @author Dmitry (dio) Levashov
      **/
     protected function _rmdir($path) {
-        return $this->_unlink($path . '/');
+        $newkey = $this->_normpath($path).'/';
+
+        try {
+            $obj = $this->s3->deleteObject(array('Bucket' => $this->options['bucket'], 'Key' => $newkey));
+            return true;
+        } catch (Exception $e) {
+
+        }
+        return false;
     }
 
     /**
@@ -611,7 +614,15 @@ class ElFinderVolumeS3 extends ElFinderVolumeDriver {
         $newkey = $this->_normpath($path);
         $newkey = preg_replace("/\/$/", "", $newkey);
 
-        $this->s3->putObject(['Bucket' => $this->options['bucket'], 'Key' => $newkey, 'Body' => $content, 'ACL' => CannedAcl::PUBLIC_READ]);
+        $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        $this->s3->putObject([
+            'Bucket' => $this->options['bucket'],
+            'Key' => $newkey,
+            'Body' => $content,
+            'ACL' => CannedAcl::PUBLIC_READ,
+            'ContentType' => self::$mimetypes[$ext]
+        ]);
         return true;
     }
 
