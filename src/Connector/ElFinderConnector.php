@@ -70,7 +70,7 @@ class ElFinderConnector {
      **/
     public function execute($queryParameters) {
         $isPost = $_SERVER["REQUEST_METHOD"] == 'POST';
-        $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? $_POST : $queryParameters;
+        $src    = $_SERVER["REQUEST_METHOD"] == 'POST' ? array_merge($_POST, $queryParameters) : $queryParameters;
         if ($isPost && !$src && $rawPostData = @file_get_contents('php://input')) {
             // for support IE XDomainRequest()
             $parts = explode('&', $rawPostData);
