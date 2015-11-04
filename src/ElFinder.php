@@ -404,6 +404,15 @@ class ElFinder {
     }
 
     /**
+     * Return array of volume
+     *
+     * @return array
+     */
+    public function getVolumes() {
+        return $this->volumes;
+    }
+
+    /**
      * Return root - file's owner (public func of volume())
      *
      * @param  string  file hash
