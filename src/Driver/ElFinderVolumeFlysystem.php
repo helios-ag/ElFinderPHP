@@ -138,74 +138,93 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
     }
 
     /**
-     * Return stat for given path.
-     * Stat contains following fields:
-     * - (int)    size    file size in b. required
-     * - (int)    ts      file modification time in unix time. required
-     * - (string) mime    mimetype. required for folders, others - optionally
-     * - (bool)   read    read permissions. required
-     * - (bool)   write   write permissions. required
-     * - (bool)   locked  is object locked. optionally
-     * - (bool)   hidden  is object hidden. optionally
-     * - (string) alias   for symlinks - link target path relative to root path. optionally
-     * - (string) target  for symlinks - link target path. optionally
+     * Check if the directory exists in the parent directory. Needed because not all drives handle directories correctly.
      *
-     * If file does not exists - returns empty array or false.
-     *
-     * @param  string  $path    file path
-     * @return array|false
+     * @param  string  $path  path
+     * @return boolean
      **/
-    protected function _stat($path)
+    protected function _dirExists($path)
     {
-        $stat = array(
-            'mime' => 'directory',
-            'ts' => time(),
-            'read' => true,
-            'write' => true,
-            'locked' => false,
-            'hidden' => false,
-            'size' => 0,
-        );
+        $dir = $this->_dirname($path);
+        $basename = basename($path);
 
-        // If root, just return from above
-        if ($this->root == $path) {
-            $stat['name'] = $this->root;
-            return $stat;
-        }
-
-        // If not exists, return empty
-        if ( !$this->fs->has($path)) {
-            return array();
-        }
-
-        $meta = $this->fs->getMetadata($path);
-
-        // Get timestamp/size
-        $stat['ts'] = isset($meta['timestamp'])? $meta['timestamp'] : $this->fs->getTimestamp($path);
-        $stat['size'] = isset($meta['size'])? $meta['size'] : $this->fs->getSize($path);
-
-        // Check if file, if so, check mimetype
-        if ($meta['type'] == 'file') {
-            $stat['mime'] = isset($meta['mimetype'])? $meta['mimetype'] : $this->fs->getMimetype($path);
-
-            $imgMimes = ['image/jpeg', 'image/png', 'image/gif'];
-            if ($this->urlBuilder && in_array($stat['mime'], $imgMimes)) {
-                $stat['url'] = $this->urlBuilder->getUrl($path, ['ts' => $stat['ts']]);
-                $stat['tmb'] = $this->urlBuilder->getUrl($path, [
-                    'ts' => $stat['ts'],
-                    'w' => $this->tmbSize,
-                    'h' => $this->tmbSize,
-                    'fit' => $this->options['tmbCrop'] ? 'crop' : 'contain',
-                ]);
+        foreach ($this->fs->listContents($dir) as $meta) {
+            if ($meta['type'] !== 'file' && $meta['basename'] == $basename) {
+                return true;
             }
         }
-
-        if (! isset($stat['url']) && $this->fs->getUrl()) {
-            $stat['url'] = 1;
-        }
-
-        return $stat;
+        return false;
     }
+
+  /**
+   * Return stat for given path.
+   * Stat contains following fields:
+   * - (int)    size    file size in b. required
+   * - (int)    ts      file modification time in unix time. required
+   * - (string) mime    mimetype. required for folders, others - optionally
+   * - (bool)   read    read permissions. required
+   * - (bool)   write   write permissions. required
+   * - (bool)   locked  is object locked. optionally
+   * - (bool)   hidden  is object hidden. optionally
+   * - (string) alias   for symlinks - link target path relative to root path. optionally
+   * - (string) target  for symlinks - link target path. optionally
+   *
+   * If file does not exists - returns empty array or false.
+   *
+   * @param  string  $path    file path
+   * @return array|false
+   **/
+  protected function _stat($path)
+  {
+      $stat = array(
+          'size' => 0,
+          'ts' => time(),
+          'read' => true,
+          'write' => true,
+          'locked' => false,
+          'hidden' => false,
+          'mime' => 'directory',
+      );
+      // If root, just return from above
+      if ($this->root == $path) {
+          $stat['name'] = $this->root;
+          return $stat;
+      }
+      // If not exists, return empty
+      if ( !$this->fs->has($path)) {
+
+          // Check if the parent doesn't have this path
+          if ($this->_dirExists($path)) {
+              return $stat;
+          }
+
+          // Neither a file or directory exist, return empty
+          return array();
+      }
+      $meta = $this->fs->getMetadata($path);
+      // Get timestamp/size
+      $stat['ts'] = isset($meta['timestamp'])? $meta['timestamp'] : $this->fs->getTimestamp($path);
+      $stat['size'] = isset($meta['size'])? $meta['size'] : $this->fs->getSize($path);
+
+      // Check if file, if so, check mimetype
+      if ($meta['type'] == 'file') {
+          $stat['mime'] = isset($meta['mimetype'])? $meta['mimetype'] : $this->fs->getMimetype($path);
+          $imgMimes = ['image/jpeg', 'image/png', 'image/gif'];
+          if ($this->urlBuilder && in_array($stat['mime'], $imgMimes)) {
+              $stat['url'] = $this->urlBuilder->getUrl($path, ['ts' => $stat['ts']]);
+              $stat['tmb'] = $this->urlBuilder->getUrl($path, [
+                  'ts' => $stat['ts'],
+                  'w' => $this->tmbSize,
+                  'h' => $this->tmbSize,
+                  'fit' => $this->options['tmbCrop'] ? 'crop' : 'contain',
+              ]);
+          }
+      }
+      if (! isset($stat['url']) && $this->fs->getUrl()) {
+          $stat['url'] = 1;
+      }
+      return $stat;
+  }
 
     /***************** file stat ********************/
 
@@ -547,6 +566,15 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
     {
         return;
     }
+
+    /**
+  	 * chmod implementation
+  	 *
+  	 * @return bool
+  	 **/
+  	protected function _chmod($path, $mode) {
+  		return false;
+  	}
 
     /**
      * Resize image
