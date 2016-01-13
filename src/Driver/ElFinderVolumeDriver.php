@@ -2572,6 +2572,7 @@ abstract class ElFinderVolumeDriver {
                 if (empty($stat['hidden'])) {
                     $name = $stat['name'];
                     if (!$this->copy($this->_joinPath($src, $name), $dst, $name)) {
+                        $this->clearcache();
                         $this->remove($dst, true); // fall back
                         return false;
                     }
