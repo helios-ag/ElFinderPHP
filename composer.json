@@ -1,6 +1,6 @@
 {
     "name": "helios-ag/fm-elfinder-php-connector",
-    "description": "ElFinder PHP backend, 5.3 compliant",
+    "description": "ElFinder PHP backend, 5.4 compliant",
     "keywords": ["elfinder", "filemanager"],
     "homepage": "http://github.com/helios-ag/ElFinderPHP",
     "type": "library",
@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.4"
     },
     "suggest": {
         "dropbox-php/dropbox-php": "Allows you to use Dropbox storage",
