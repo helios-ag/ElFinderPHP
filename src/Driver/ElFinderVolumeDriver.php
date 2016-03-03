@@ -4813,8 +4813,8 @@ abstract class ElFinderVolumeDriver {
     protected static function zipArchiveZip($dir, $files, $zipPath) {
         try {
             if ($start = is_string($zipPath)) {
-                $zip = new ZipArchive();
-                if ($zip->open($dir . DIRECTORY_SEPARATOR . $zipPath, ZipArchive::CREATE) !== true) {
+                $zip = new \ZipArchive();
+                if ($zip->open($dir . DIRECTORY_SEPARATOR . $zipPath, \ZipArchive::CREATE) !== true) {
                     $zip = false;
                 }
             } else {
@@ -4859,7 +4859,7 @@ abstract class ElFinderVolumeDriver {
      */
     protected static function zipArchiveUnzip($zipPath, $toDir) {
         try {
-            $zip = new ZipArchive();
+            $zip = new \ZipArchive();
             if ($zip->open($zipPath) === true) {
                 $zip->extractTo($toDir);
                 $zip->close();
