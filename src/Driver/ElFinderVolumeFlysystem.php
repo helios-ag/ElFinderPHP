@@ -216,9 +216,12 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
             return array();
         }
         $meta = $this->fs->getMetadata($path);
-        // Set item filename to `name` if exists
-        if (isset($meta['filename'])) {
+        // Set item filename.extension to `name` if exists
+        if (isset($meta['filename']) && isset($meta['extension'])) {
             $stat['name'] = $meta['filename'];
+            if ($meta['extension'] !== '') {
+                $stat['name'] .= '.' . $meta['extension'];
+            }
         }
         // Get timestamp/size
         $stat['ts'] = isset($meta['timestamp'])? $meta['timestamp'] : $this->fs->getTimestamp($path);
