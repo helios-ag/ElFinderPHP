@@ -2541,7 +2541,7 @@ abstract class ElFinderVolumeDriver {
      * @author Dmitry (dio) Levashov
      * @author Troex Nevelin
      **/
-    protected function encode($path) {
+    public function encode($path) {
         if ($path !== '') {
 
             // cut ROOT from $path for security reason, even if hacker decodes the path he will not know the root
@@ -2571,7 +2571,7 @@ abstract class ElFinderVolumeDriver {
      * @author Dmitry (dio) Levashov
      * @author Troex Nevelin
      **/
-    protected function decode($hash) {
+    public function decode($hash) {
         if (strpos($hash, $this->id) === 0) {
             // cut volume id after it was prepended in encode
             $h = substr($hash, strlen($this->id));
