@@ -332,7 +332,10 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
     protected function _mkdir($path, $name)
     {
         $path = $this->_joinPath($path, $name);
-        return $this->_resultPath($this->fs->createDir($path), $path);
+        if ($this->fs->createDir($path) === false) {
+            return false;
+        }
+        return $path;
     }
     /**
      * Create file and return it's path or false on failed
