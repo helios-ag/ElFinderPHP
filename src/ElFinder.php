@@ -727,7 +727,7 @@ class ElFinder {
     protected function getPluginInstance($name, $opts = array()) {
         $key = strtolower($name);
         if (! isset($this->plugins[$key])) {
-            $p_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . 'plugin.php';
+            $p_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'Plugins' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . 'plugin.php';
             if (is_file($p_file)) {
                 require_once $p_file;
                 $class = 'ElFinderPlugin' . $name;
