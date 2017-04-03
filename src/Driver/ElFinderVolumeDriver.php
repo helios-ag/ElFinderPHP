@@ -3853,6 +3853,7 @@ abstract class ElFinderVolumeDriver {
 
         $this->fcloseCE($src, $path);
         fclose($trg);
+        @chmod($tmb, $this->options['fileMode']);
 
         $result = false;
 
