@@ -164,7 +164,7 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
             }
             $result = $this->fs->getMetaData($requestPath);
         }
-        $path = ($result && isset($result['path']))? $result['path'] : false;
+        $path = $result ? (isset($result['path']) ? $result['path'] : $requestPath) : false;
         if ($this->fscache && $path !== $requestPath) {
             $this->fscache->storeMiss($requestPath);
         }
@@ -418,7 +418,6 @@ class ElFinderVolumeFlysystem extends ElFinderVolumeDriver {
             $config['mimetype'] = self::$mimetypes[$ext];
         }
         return $this->_resultPath($this->fs->putStream($path, $fp, $config), $path);
-        return false;
     }
     /**
      * Get file contents
