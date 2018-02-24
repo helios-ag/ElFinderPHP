@@ -4,7 +4,7 @@
     "keywords": ["elfinder", "filemanager"],
     "homepage": "http://github.com/helios-ag/ElFinderPHP",
     "type": "library",
-    "license": "BSD-3 Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Al Ganiev",
