@@ -906,6 +906,18 @@ class ElFinderVolumeFTP extends ElFinderVolumeDriver {
 		return array();
 	}
 
+    /**
+     * chmod availability
+     *
+     * @return bool
+     **/
+    protected function _chmod($path, $mode) {
+        $modeOct = is_string($mode) ? octdec($mode) : octdec(sprintf("%04o",$mode));
+        $ret = @chmod($path, $modeOct);
+        $ret && clearstatcache();
+        return  $ret;
+    }
+
 	/**
 	 * Unpack archive
 	 *
@@ -1330,7 +1342,7 @@ class ElFinderVolumeFTP extends ElFinderVolumeDriver {
 	 * @param int $degree
 	 * @return array|bool|false
 	 */
-	public function resize($hash, $width, $height, $x, $y, $mode = 'resize', $bg = '', $degree = 0) {
+	public function resize($hash, $width, $height, $x, $y, $mode = 'resize', $bg = '', $degree = 0, $jpgQuality = NULL) {
 		if ($this->commandDisabled('resize')) {
 			return $this->setError(ElFinder::ERROR_PERM_DENIED);
 		}
@@ -1362,28 +1374,28 @@ class ElFinderVolumeFTP extends ElFinderVolumeDriver {
 			return $this->setError(ElFinder::ERROR_UNSUPPORT_TYPE);
 		}
 
-		switch($mode) {
+        switch($mode) {
 
-			case 'propresize':
-				$result = $this->imgResize($local_path, $width, $height, true, true);
-				break;
+            case 'propresize':
+                $result = $this->imgResize($work_path, $width, $height, true, true, null, $jpgQuality);
+                break;
 
-			case 'crop':
-				$result = $this->imgCrop($local_path, $width, $height, $x, $y);
-				break;
+            case 'crop':
+                $result = $this->imgCrop($work_path, $width, $height, $x, $y, null, $jpgQuality);
+                break;
 
-			case 'fitsquare':
-				$result = $this->imgSquareFit($local_path, $width, $height, 'center', 'middle', ($bg ? $bg : $this->options['tmbBgColor']));
-				break;
+            case 'fitsquare':
+                $result = $this->imgSquareFit($work_path, $width, $height, 'center', 'middle', ($bg ? $bg : $this->options['tmbBgColor']), null, $jpgQuality);
+                break;
 
-			case 'rotate':
-				$result = $this->imgRotate($local_path, $degree, ($bg ? $bg : $this->options['tmbBgColor']));
-				break;
+            case 'rotate':
+                $result = $this->imgRotate($work_path, $degree, ($bg ? $bg : $this->options['tmbBgColor']), null, $jpgQuality);
+                break;
 
-			default:
-				$result = $this->imgResize($local_path, $width, $height, false, true);
-				break;
-		}
+            default:
+                $result = $this->imgResize($work_path, $width, $height, false, true, null, $jpgQuality);
+                break;
+        }
 
 		if ($result) {
 
@@ -1403,4 +1415,3 @@ class ElFinderVolumeFTP extends ElFinderVolumeDriver {
 	}
 
 } // END class
-
